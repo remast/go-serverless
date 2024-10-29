@@ -140,7 +140,7 @@
           <h1>Tarifrechner DogOP</h1>
         </section>
         <section>
-          <h2>Serverless DogOp</h2>
+          <h2>Serverless Tarifrechner DogOp</h2>
           <div class="grid grid-cols-12 gap-1 content-start" style="font-size: 75%;">
             <div class="col-span-6 fragment">
               <h4 class="cross-yellow">Function-as-a-Service</h4>
@@ -157,7 +157,8 @@
               </ol>
             </div>
           </div>
-        </section>        
+        </section>
+        <!--
         <section>
           <h2>Serverless DogOp</h2>
           <div class="grid grid-cols-12 gap-1 content-start" style="font-size: 75%;">
@@ -168,12 +169,6 @@
                 <li>Google Cloud Run Function</li>
                 <li>Cloud Run Function Performance</li>
                 <li>Azure Function</li>
-                <!--
-                <li>Konfiguration per Umgebungsvariable</li>
-                <li>Structs</li>
-                <li>Fehler behandeln</li>
-                <li>Unit Tests</li>
-                -->
               </ol>
             </div>
             <div class="col-span-6 fragment">
@@ -184,13 +179,6 @@
                 <li>Google Cloud Run</li>
                 <li>Cloud Run Function Performance</li>
                 <li>Azure Container Apps</li>
-                <!--
-                <li>CRUD API für Angebote</li>
-                <li>Context</li>
-                <li><span class="cross-red">Health Check</li>
-                <li><span class="cross-red">Problem Details</li>
-                <li><span class="cross-red">Middleware</li>
--->
               </ol>
             </div>
           </div>
@@ -219,7 +207,8 @@
             <li class="fragment cross-red">Health Check</li>
           </ul>
         </section>
-      </section>
+      -->
+    </section>
       <section>
         <section data-background-image="./themes/Pattern-13-outline.svg" data-background-size="400px"
         data-background-repeat="repeat" data-background-opacity=".15">
@@ -290,7 +279,7 @@
         </section>
         <section>
           <h2 class="cross-yellow">Quote Function aufsetzen</h2>
-          <pre style="font-size: 0.403em;"><code data-trim data-noescape class="go" data-line-numbers="1-8,14|9|10-12|13|">
+          <pre style="font-size: 0.403em;"><code data-trim data-noescape class="go" data-line-numbers="1|3-6|8,9,13|10-12|">
           package dogop
           
           import (
@@ -298,6 +287,7 @@
             "github.com/GoogleCloudPlatform/functions-framework-go/functions"
           )
           
+          // Package Init Function
           func init() {
             functions.HTTP("HandleQuote", func(w http.ResponseWriter, req *http.Request) {
               w.Write([]byte("Hello Quote!"))
@@ -318,8 +308,8 @@
           <img class="fragment" src="themes/go-serverless/gcp-cloud-run-func-3.png" />
         </section>
         <section>
-          <h2 class="cross-yellow">REST API für Rechner</h2>
-          <pre style="font-size: 0.44em;"><code data-trim data-noescape class="go" data-line-numbers="14,17,24|1,12|2-4|6-8|10-11|">
+          <h2 class="cross-yellow">Quote mit Rechner</h2>
+          <pre style="font-size: 0.44em;" class="fragment"><code data-trim data-noescape class="go" data-line-numbers="1,12,15|2-4|6-8|10-12|">
           func HandleQuote(w http.ResponseWriter, r *http.Request) {
             // 1. JSON Request lesen
             var q Quote
@@ -338,7 +328,7 @@
           }
         </code></pre>
           <div class="fragment box-content rounded p-6 border-4 transform -rotate-12 text-black"
-            style="position: relative; top: -380px; background-color: rgba(255, 200, 0);">
+            style="position: relative; top: -280px; background-color: rgba(255, 200, 0);">
             Achtung, noch ohne Fehlerhandling! 💣
           </div>
         </section>
@@ -360,6 +350,31 @@
           // Struct erzeugen
           tariff := Tariff{Name: "Dog OP _ Basic", Rate: 12.4}
         </code></pre>
+        </section>
+        <section>
+          <h2 class="cross-yellow">Quote Function deployen</h2>
+          <ul>
+            <li class="fragment">Deployment als Zip-Datei</li>
+            <li></li>
+          </ul>
+          <pre class="fragment"><code data-trim data-noescape class="bash">
+            function.zip
+              |- main.go
+              |- go.mod
+          </code></pre>
+        </section>
+        <section>
+          <h2 class="cross-yellow">Quote Function testen</h2>
+          <img class="fragment" src="themes/go-serverless/gcp-cloud-run-func-rest-test.png" />
+        </section>
+        <section>
+          <h2 class="cross-yellow">Quote Function <span style="font-size: 70%">Zahlen, Daten, Fakten</span></h2>
+          <ul>
+            <li class="fragment">Function Container Image <b>14,5 MB</b></li>
+            <li class="fragment">Container Startup in <b>50-60 ms</b></li>
+            <li class="fragment">Hautspeicher <b>25 MB</b></li>
+            <li class="fragment">Antwortzeit Quote <b>15 ms</b></li>
+          </ul>
         </section>
         <section>
           <h2 class="cross-yellow">Fehler 💣</h2>
