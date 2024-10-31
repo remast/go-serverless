@@ -355,9 +355,9 @@
           <h2 class="cross-yellow">Quote Function deployen</h2>
           <ul>
             <li class="fragment">Deployment als Zip-Datei</li>
-            <li></li>
+            <li class="fragment">Cloud Build baut Docker Container</li>
           </ul>
-          <pre class="fragment"><code data-trim data-noescape class="bash">
+          <pre class="fragment"><code data-trim data-noescape class="bf">
             function.zip
               |- main.go
               |- go.mod
@@ -368,12 +368,12 @@
           <img class="fragment" src="themes/go-serverless/gcp-cloud-run-func-rest-test.png" />
         </section>
         <section>
-          <h2 class="cross-yellow">Quote Function <span style="font-size: 70%">Zahlen, Daten, Fakten</span></h2>
+          <h3 class="cross-yellow">Quote Cloud Run Function <br> <span style="font-size: 70%; position: relative; top: -15px;">Zahlen, Daten, Fakten</span></h3>
           <ul>
-            <li class="fragment">Function Container Image <b>14,5 MB</b></li>
-            <li class="fragment">Container Startup in <b>50-60 ms</b></li>
-            <li class="fragment">Hautspeicher <b>25 MB</b></li>
-            <li class="fragment">Antwortzeit Quote <b>15 ms</b></li>
+            <li class="fragment">Function Container Image <b class="cross-blue">14,5 MB</b></li>
+            <li class="fragment">Container Startup in <b class="cross-blue">50-60 ms</b></li>
+            <li class="fragment">Hautspeicher <b class="cross-blue">25 MB</b></li>
+            <li class="fragment">Antwortzeit Quote <b class="cross-blue">15 ms</b></li>
           </ul>
         </section>
         <section>
@@ -487,6 +487,176 @@
         <section>
           <h2 class="cross-yellow">HTTP Handler testen</h2>
           <img src="themes/go-cloud-native/vscode_handler_test.png" width="80%" />
+        </section>
+      </section>
+      <section>
+        <section data-background-image="./themes/Pattern-29-outline.svg" data-background-size="400px"
+        data-background-repeat="repeat" data-background-opacity=".15">
+          <h1 class="cross-blue">Quote <br /> Azure Function App</h1>
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Azure Function aufsetzen</h2>
+          <pre style="font-size: 0.45em;"><code data-trim data-noescape class="go" data-line-numbers="4-6,8,21|9-14|16-17|19-20|">
+            package main
+            
+            import (
+              "net/http"
+              "os"
+            )
+            
+            func main() {
+              // 1. Port initialisieren
+              listenAddr := ":8080" // Default Port
+              customHandlerPort, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT")
+              if ok {
+                listenAddr = ":" + customHandlerPort
+              }
+
+              // 2. Quote Handler registrieren
+              http.HandleFunc("/api/quote", HandleQuote)
+
+              // 3. Web Server starten
+              http.ListenAndServe(listenAddr, nil)
+            }
+          </code></pre>
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Azure Function aufsetzen</h2>
+          <div class="grid grid-cols-12 gap-1 content-start" style="font-size: 75%;">
+            <div class="col-span-6 fragment">
+              <kbd>host.json</kbd>
+              <pre style="font-size: 0.39em;"><code data-trim data-noescape class="json" data-line-numbers="">
+                {
+                  "version": "2.0",
+                  "logging": {
+                    "applicationInsights": {
+                      "samplingSettings": {
+                        "isEnabled": true,
+                        "excludedTypes": "Request"
+                      }
+                    }
+                  },
+                  "extensionBundle": {
+                    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+                    "version": "[4.*, 5.0.0)"
+                  },
+                  "customHandler": {
+                    "description": {
+                      "defaultExecutablePath": "function",
+                      "workingDirectory": "",
+                      "arguments": []
+                    },
+                    "enableForwardingHttpRequest": true
+                  }
+                }
+              </code></pre>
+            </div>
+            <div class="col-span-6 fragment">
+              <kbd>quote/function.json</kbd>
+              <pre style="font-size: 0.39em;"><code data-trim data-noescape class="json" data-line-numbers="">
+                {
+                  "bindings": [
+                    {
+                      "authLevel": "anonymous",
+                      "type": "httpTrigger",
+                      "direction": "in",
+                      "name": "req",
+                      "methods": [
+                        "get",
+                        "post"
+                      ]
+                    },
+                    {
+                      "type": "http",
+                      "direction": "out",
+                      "name": "res"
+                    }
+                  ]
+                }
+              </code></pre>
+            </div>
+          </div>
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Azure Function deployen</h2>
+          <ul>
+            <li class="fragment">Deployment als Zip-Datei</li>
+            <li class="fragment">Function Binary als Linux Executable <br> <kbd style="font-size: 0.7em; position: relative; top: -10px">GOOS=linux GOARCH=amd64 go build main.go</kbd></li>
+          </ul>
+          <pre class="fragment"><code data-trim data-noescape class="bf">
+            function.zip
+              |- function
+              |- quote/function.json
+              |- host.json
+          </code></pre>
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Function erstellen</h2>
+          <img class="fragment" src="themes/go-serverless/azure-func-app-1.png" />
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Function erstellen</h2>
+          <img class="fragment" src="themes/go-serverless/azure-func-app-2.png" />
+        </section>
+        <section>
+          <h2 class="cross-blue">Quote Function erstellen</h2>
+          <span style="font-size: 80%;">Benötigte Azure Resourcen:</span>
+          <img src="themes/go-serverless/dogop-az-func-resources.png" />
+        </section>
+        <section>
+          
+          <h2 class="cross-blue">   
+            Quote Azure Function  <br/>
+            <img style="width: 40px; display: inline;" src="themes/go-serverless/tf-icon.png" /> 
+            <span style="font-size: 70%;">Terraform Deployment</span>
+           </h2>
+          <pre class="fragment" style="font-size: 0.33em;"><code data-trim data-noescape class="hcl">
+            resource "azurerm_linux_function_app" "dogop" {
+              name                        = "dogop-serverless-quote"
+              functions_extension_version = "~4"
+              resource_group_name         = azurerm_resource_group.dogop.name
+              location                    = azurerm_resource_group.dogop.location
+
+              # Service Plan
+              service_plan_id             = azurerm_service_plan.dogop.id
+
+              # Stored Function Binary
+              storage_account_name        = azurerm_storage_account.dogop.name
+              storage_account_access_key  = azurerm_storage_account.dogop.primary_access_key
+              zip_deploy_file             = data.archive_file.app.output_path
+        
+              # App Insights
+              site_config {
+                application_insights_connection_string = azurerm_application_insights.insights.connection_string
+                application_insights_key               = azurerm_application_insights.insights.instrumentation_key
+              }
+            
+              app_settings = {
+                "WEBSITE_RUN_FROM_PACKAGE" = 1
+              }
+            
+            }
+          </code></pre>
+        </section>
+        <section>
+          <h3 class="cross-blue">Quote Azure Function App<br> <span style="font-size: 70%; position: relative; top: -15px;">Zahlen, Daten, Fakten</span></h3>
+          <ul>
+            <li class="fragment">Antwortzeit Quote <b class="cross-blue">30 ms</b></li>
+            <li class="fragment">Binary <kbd style="font-size: 90%;">function</kbd> Größe <b class="cross-blue">9 MB</b></li>
+            <li class="fragment">Keine Dependencies extra Dependencies, nur Standardlib</li>
+          </ul>
+        </section>
+      </section>
+      <section>
+        <section data-background-image="./themes/Pattern-20-outline.svg" data-background-size="400px"
+        data-background-repeat="repeat" data-background-opacity=".15">
+          <h1 class="cross-yellow">Quote <br /> Google Cloud Run</h1>
+        </section>
+      </section>
+      <section>
+        <section data-background-image="./themes/Pattern-32-outline.svg" data-background-size="400px"
+        data-background-repeat="repeat" data-background-opacity=".15">
+          <h1 class="cross-blue">Quote <br /> Azure Container App</h1>
         </section>
       </section>
       <section>
