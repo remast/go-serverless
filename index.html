@@ -372,7 +372,7 @@
           <ul>
             <li class="fragment">Function Container Image <b class="cross-blue">14,5 MB</b></li>
             <li class="fragment">Container Startup in <b class="cross-blue">50-60 ms</b></li>
-            <li class="fragment">Hautspeicher <b class="cross-blue">25 MB</b></li>
+            <li class="fragment">Hauptspeicher <b class="cross-blue">25 MB</b></li>
             <li class="fragment">Antwortzeit Quote <b class="cross-blue">15 ms</b></li>
           </ul>
         </section>
@@ -603,8 +603,8 @@
           <span style="font-size: 80%;">Benötigte Azure Resourcen:</span>
           <img src="themes/go-serverless/dogop-az-func-resources.png" />
         </section>
-        <section>
-          
+        <!--
+        <section>          
           <h2 class="cross-blue">   
             Quote Azure Function  <br/>
             <img style="width: 40px; display: inline;" src="themes/go-serverless/tf-icon.png" /> 
@@ -638,12 +638,13 @@
             }
           </code></pre>
         </section>
+        -->
         <section>
           <h3 class="cross-blue">Quote Azure Function App<br> <span style="font-size: 70%; position: relative; top: -15px;">Zahlen, Daten, Fakten</span></h3>
           <ul>
             <li class="fragment">Antwortzeit Quote <b class="cross-blue">30 ms</b></li>
             <li class="fragment">Binary <kbd style="font-size: 90%;">function</kbd> Größe <b class="cross-blue">9 MB</b></li>
-            <li class="fragment">Keine Dependencies extra Dependencies, nur Standardlib</li>
+            <li class="fragment">Keine extra Dependencies, nur Standardlib 😍</li>
           </ul>
         </section>
       </section>
@@ -652,12 +653,145 @@
         data-background-repeat="repeat" data-background-opacity=".15">
           <h1 class="cross-yellow">Quote <br /> Google Cloud Run</h1>
         </section>
+        <section>
+          <h2 class="cross-white">Go Standardlib WebServer nutzen</h2>
+          <pre style="font-size: 0.38em;"><code data-trim data-noescape class="go" data-line-numbers="8,30|8-14|16-17|16-25|27-29|">
+            package main
+            
+            import (
+              "net/http"
+              "os"
+            )
+            
+            func main() {
+              // 1. Port initialisieren
+              listenAddr := ":8080" // Default Port
+              customHandlerPort, ok := os.LookupEnv("PORT")
+              if ok {
+                listenAddr = ":" + customHandlerPort
+              }
+
+              // 2. Http Router erstellen
+              router := http.NewServeMux()
+
+              // a) Quote Handler registrieren
+              router.HandleFunc("POST /api/quote", HandleQuote)
+
+              // b) Quote Handler registrieren
+              router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+                w.Write([]byte("Hello DogOp!"))
+              })
+
+              // 3. Web Server starten
+              log.Printf("Listening on %v", listenAddr)
+              http.ListenAndServe(listenAddr, router)
+            }
+          </code></pre>
+        </section>
+        <section>
+          <h2 class="cross-white">Dockerfile für DogOP</h2>
+          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="bash" data-trim data-noescape data-line-numbers="1-5|7-11|">
+          # 1. DogOp Builder
+          FROM golang as builder
+          WORKDIR /app
+          ADD . /app
+          RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o build/dogop .
+          
+          # 2. DogOp Container
+          FROM alpine
+          COPY --from=builder /app/build/dogop /usr/bin/
+          EXPOSE 8080
+          ENTRYPOINT ["/usr/bin/dogop"]
+        </code></pre>
+        <div class="fragment box-content rounded p-6 border-4 transform -rotate-12 text-black"
+          style="position: relative; top: -260px; background-color: rgb(178, 178, 178);">
+          🚢 Docker Image Alpine <b>14 MB</b>
+        </div>
+        </section>
+        <section>          
+          <h2 class="cross-white">Docker DogOP mit <img src="themes/buildpacks-logo.png" style="width: 5em; display: inline;"></h2>
+          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="clean" data-trim data-noescape>
+            // 1. Docker Image bauen
+            >_ pack build dogop-cnb 
+                 --buildpack paketo-buildpacks/go  
+                 --builder paketobuildpacks/builder-jammy-tiny
+          </code></pre>
+          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="clean" data-trim data-noescape>
+            // 2. Docker Image ausühren
+            >_ docker run dogop-cnb
+          </code></pre>
+          <div class="fragment box-content rounded p-6 border-4 transform -rotate-12 text-black"
+          style="position: relative; top: -260px; background-color: rgb(178, 178, 178);">
+          🚢 Docker Image Buildpack <b>40 MB</b>
+          </div>
+        </section>
+        <section>
+          <h2 class="cross-yellow">Cloud Run erstellen</h2>
+          <img style="width: 87%;" src="themes/go-serverless/gcp-cloud-run-create.png" />
+        </section>
+        <section>
+          <h3 class="cross-yellow">Quote Cloud Function <br> <span style="font-size: 70%; position: relative; top: -15px;">Zahlen, Daten, Fakten</span></h3>
+          <ul>
+            <li class="fragment">Container Startup in <b class="cross-blue">40-80 ms</b></li>
+            <li class="fragment">Hauptspeicher <b class="cross-blue">25 MB</b></li>
+            <li class="fragment">Antwortzeit Quote <b class="cross-blue">17 ms</b></li>
+          </ul>
+        </section>        
       </section>
       <section>
         <section data-background-image="./themes/Pattern-32-outline.svg" data-background-size="400px"
         data-background-repeat="repeat" data-background-opacity=".15">
           <h1 class="cross-blue">Quote <br /> Azure Container App</h1>
         </section>
+        <section>
+          <h2 class="cross-blue">Container App erstellen</h2>
+          <img src="themes/go-serverless/dogop-container-app-create-1.png" />
+        </section>
+        <section>
+          <h2 class="cross-blue">Container App erstellen</h2>
+          <img src="themes/go-serverless/dogop-container-app-create-2.png" />
+        </section>
+        <section>
+          <h2 class="cross-blue">Container App erstellen</h2>
+          <img src="themes/go-serverless/dogop-container-app-create-3.png" />
+        </section>
+        <section>
+          <h3 class="cross-blue">Azure Container App <br> <span style="font-size: 70%; position: relative; top: -15px;">Zahlen, Daten, Fakten</span></h3>
+          <ul>
+            <li class="fragment">Container Startup in <b class="cross-blue">600 ms</b> 😮‍💨</li>
+            <li class="fragment">Antwortzeit Quote <b class="cross-blue">13 ms</b></li>
+          </ul>
+        </section>
+        <section data-background-image="./themes/Pattern-1-outline.svg" data-background-size="400px"
+        data-background-repeat="repeat" data-background-opacity=".15">
+        <h1 class="cross-red">Fallschirm und Rettungsgurt</h1>
+      </section>
+      <section>
+        <h2 class="cross-red">Health Check</h2>
+        <ul>
+          <li>Nutzung von <code>health-go</code> (hellofresh)</li>
+          <li>Integration des Checks für <code>pgx</code></li>
+        </ul>
+      </section>
+      <section>
+        <h2 class="cross-red">Health Check</h2>
+        <pre class="fragment" style="font-size: .43em;"><code data-trim data-noescape class="go" data-trim data-noescape data-line-numbers="1-11|13-14|">
+// Register Health Check
+h, _ := health.New(health.WithChecks(
+  health.Config{
+    Name:      "db",
+    Timeout:   time.Second * 2,
+    SkipOnErr: false,
+    Check: healthPgx.New(healthPgx.Config{
+      DSN: config.Db,
+    }),
+  },
+))
+
+// Register Handler Function
+r.HandleFunc("GET /health", h.HandlerFunc)
+      </code></pre>
+      </section>
       </section>
       <section>
         <section data-background-image="./themes/Pattern-13-outline.svg" data-background-size="400px"
@@ -952,35 +1086,6 @@
             http.ListenAndServe(fmt.Sprintf(":%v", config.Port), r)
           }
         </code></pre>
-        </section>
-        <section>
-          <h2 class="cross-yellow">Dockerfile für DogOP</h2>
-          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="bash" data-trim data-noescape data-line-numbers="1-5|7-11|">
-          # 1. DogOp Builder
-          FROM golang as builder
-          WORKDIR /app
-          ADD . /app
-          RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o build/dogop .
-          
-          # 2. DogOp Container
-          FROM alpine
-          COPY --from=builder /app/build/dogop /usr/bin/
-          EXPOSE 8080
-          ENTRYPOINT ["/usr/bin/dogop"]
-        </code></pre>
-        </section>
-        <section>          
-          <h2 class="cross-yellow">Docker DogOP mit <img src="themes/buildpacks-logo.png" style="width: 5em; display: inline;"></h2>
-          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="clean" data-trim data-noescape>
-            // 1. Docker Image bauen
-            >_ pack build dogop-cnb 
-                 --buildpack paketo-buildpacks/go  
-                 --builder paketobuildpacks/builder-jammy-base
-          </code></pre>
-          <pre class="fragment" style="font-size: .51em;"><code data-trim data-noescape class="clean" data-trim data-noescape>
-            // 2. Docker Image ausühren
-            >_ docker run dogop-cnb
-          </code></pre>
         </section>
         <!--
         <section>
