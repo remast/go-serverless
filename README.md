@@ -1,3 +1,3 @@
-# Go über den Wolken
+# Serverless mit Go
 
-Slides und Beispiel Code zum Vortrag "Go über den Wolken".
+Slides und Beispiel Code zum Vortrag "Serverless mit Go".
